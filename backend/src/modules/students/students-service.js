@@ -4,6 +4,7 @@ const {
   findStudentDetail,
   findStudentToSetStatus,
   addOrUpdateStudent,
+  deleteStudent,
 } = require('./students-repository');
 const { findUserById } = require('../../shared/repository');
 
@@ -113,10 +114,25 @@ const setStudentStatus = async ({ userId, reviewerId, status }) => {
   return { message: 'Student status changed successfully' };
 };
 
+const removeStudent = async (id) => {
+  await checkStudentId(id);
+
+  const deleteResult = await deleteStudent(id);
+  if (deleteResult <= 0) {
+    throw new ApiError(500, 'Unable to delete student');
+  }
+
+  return {
+    message: 'Student and all related data deleted successfully',
+    details: 'Deleted student profile, leaves, policies, and refresh tokens',
+  };
+};
+
 module.exports = {
   getAllStudents,
   getStudentDetail,
   addNewStudent,
   setStudentStatus,
   updateStudent,
+  removeStudent,
 };

@@ -8,6 +8,7 @@ const {
   AddStudentSchema,
   UpdateStudentSchema,
   UpdateStudentStatusSchema,
+  DeleteStudentSchema,
 } = require('./students-schema');
 
 router.get('', validateRequest(GetAllStudentsSchema), studentController.handleGetAllStudents);
@@ -15,5 +16,6 @@ router.post('', validateRequest(AddStudentSchema), studentController.handleAddSt
 router.get('/:id', validateRequest(GetStudentDetailSchema), studentController.handleGetStudentDetail);
 router.post('/:id/status', validateRequest(UpdateStudentStatusSchema), studentController.handleStudentStatus);
 router.put('/:id', validateRequest(UpdateStudentSchema), studentController.handleUpdateStudent);
+router.delete('/:id', validateRequest(DeleteStudentSchema), studentController.handleDeleteStudent);
 
 module.exports = { studentsRoutes: router };

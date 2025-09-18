@@ -1,4 +1,5 @@
 const { processDBRequest } = require('../../utils');
+const { db } = require('../../config');
 
 const getRoleId = async (roleName) => {
   const query = 'SELECT id FROM roles WHERE name ILIKE $1';
@@ -114,6 +115,38 @@ const findStudentToUpdate = async (paylaod) => {
   return rows;
 };
 
+const deleteStudent = async (id) => {
+  const query = `
+    WITH deleted_leaves AS (
+      DELETE FROM user_leaves WHERE user_id = $1 RETURNING id
+    ),
+    deleted_leave_policies AS (
+      DELETE FROM user_leave_policy WHERE user_id = $1 RETURNING id
+    ),
+    deleted_refresh_tokens AS (
+      DELETE FROM user_refresh_tokens WHERE user_id = $1 RETURNING id
+    ),
+    deleted_profiles AS (
+      DELETE FROM user_profiles WHERE user_id = $1 RETURNING user_id
+    ),
+    deleted_user AS (
+      DELETE FROM users 
+      WHERE id = $1 AND role_id = 3
+      RETURNING id
+    )
+    SELECT 
+      (SELECT COUNT(*) FROM deleted_user) as user_deleted,
+      (SELECT COUNT(*) FROM deleted_profiles) as profile_deleted,
+      (SELECT COUNT(*) FROM deleted_leaves) as leaves_deleted,
+      (SELECT COUNT(*) FROM deleted_leave_policies) as policies_deleted,
+      (SELECT COUNT(*) FROM deleted_refresh_tokens) as tokens_deleted
+  `;
+  const queryParams = [id];
+  const { rows } = await processDBRequest({ query, queryParams });
+
+  return rows[0]?.user_deleted || 0;
+};
+
 module.exports = {
   getRoleId,
   findAllStudents,
@@ -121,4 +154,5 @@ module.exports = {
   findStudentDetail,
   findStudentToSetStatus,
   findStudentToUpdate,
+  deleteStudent,
 };

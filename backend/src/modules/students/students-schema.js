@@ -73,10 +73,17 @@ const UpdateStudentStatusSchema = z.object({
   }),
 });
 
+const DeleteStudentSchema = z.object({
+  params: z.object({
+    id: z.string().min(1, 'Student ID is required'),
+  }),
+});
+
 module.exports = {
   GetAllStudentsSchema,
   GetStudentDetailSchema,
   AddStudentSchema,
   UpdateStudentSchema,
   UpdateStudentStatusSchema,
+  DeleteStudentSchema,
 };
